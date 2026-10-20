@@ -3,7 +3,6 @@
 -- This file replaces the earlier un-applied PostgreSQL draft; it is not PostgreSQL-compatible.
 -- Generate UUID strings in application code. Authentication identities belong to the chosen auth provider.
 
-PRAGMA foreign_keys = ON;
 
 CREATE TABLE IF NOT EXISTS mailboxes (
   id TEXT PRIMARY KEY,

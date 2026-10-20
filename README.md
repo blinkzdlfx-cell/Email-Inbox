@@ -2,38 +2,43 @@
 
 A secure, school-managed email inbox for Bukana Brilliant Schools.
 
-## Project status
+## Confirmed decisions
 
-The repository is being initialized. The first milestone is a verified architecture and deployment plan before application implementation.
+- Shared mailbox: `info@bukanabriliantschools.com`
+- School domain: `bukanabriliantschools.com`
+- Staff sign-in: Google sign-in **and** email/password
+- Mailbox access: authorized staff accounts only; no public self-service access to school mail
 
 ## Planned stack
 
 - Frontend: React, Vite, TypeScript, Tailwind CSS, and shadcn/ui
-- Inbound email: Cloudflare Email Routing and an Email Worker
-- Outbound email: Brevo transactional email API
+- Inbound email: Cloudflare Email Routing and an Email Worker, subject to runtime and account verification
+- Outbound email: Brevo API, subject to sender/domain verification and suitability for human correspondence
 - Database: Neon Postgres
-- Attachments: Cloudflare R2
-- Notifications: Firebase Cloud Messaging (FCM), subject to browser and permission support
-- Hosting: Cloudflare Workers/Pages, with the exact deployment shape to be verified
+- Attachments: private Cloudflare R2 bucket
+- Authentication candidate: Neon Auth (managed Better Auth), pending confirmation that the Neon project is eligible and the required production configuration is available
+- Hosting: Cloudflare Workers/Pages; exact deployment shape to be verified
+
+## Project status
+
+The repository currently contains planning documentation. Application code, authentication, database migrations, provider integrations, and deployment are **not yet implemented or verified**. Do not treat the address above as proof that DNS, mail routing, or the mailbox is already configured.
 
 ## Security rules
 
-- Keep Brevo API keys, database credentials, and other secrets on the server in platform secrets/environment bindings.
-- Never expose credentials in frontend variables, committed files, logs, or API responses.
+- Keep provider keys, database credentials, OAuth secrets, and session secrets server-side.
+- Never commit secrets or expose them through frontend variables, logs, or API responses.
 - Authenticate and authorize every mailbox operation on the server.
-- Validate recipients, attachment size/type, message input, and upload/download access.
+- Staff accounts must be explicitly approved; public sign-up must not grant mailbox access.
+- Validate recipients, message input, attachment size/type, and upload/download permissions.
 - Use parameterized SQL, rate limits, safe HTML rendering, and security-focused tests.
-- Do not claim an email was delivered merely because the application accepted a send request.
-
-## Core capabilities
-
-The target workflow includes sign-in, inbox and message viewing, compose, reply, forward, sent mail, attachments, and notifications. These are requirements, not a claim that the features are implemented yet.
+- Do not claim an email was delivered merely because a provider accepted a send request.
 
 ## Project documents
 
-- Architecture: docs/ARCHITECTURE.md
-- Implementation plan and acceptance checks: docs/IMPLEMENTATION-PLAN.md
+- [Architecture](docs/ARCHITECTURE.md)
+- [Implementation plan](docs/IMPLEMENTATION-PLAN.md)
+- [Security and unresolved decisions](docs/SECURITY-AND-OPEN-DECISIONS.md)
 
-## Important setup note
+## Setup dependency
 
-Email receiving and sending require control of the chosen domain's DNS and verification with Cloudflare and Brevo. Provider setup, credentials, mailbox/domain configuration, and production deliverability must be verified separately from local application tests.
+The domain owner must be able to configure DNS for Cloudflare and Brevo. Provider credentials, Neon/R2 resources, staff provisioning policy, and production bindings must be configured and tested separately from local application builds.

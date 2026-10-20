@@ -7,7 +7,8 @@ Prioritize a working end-to-end email loop, but do not skip security or claim an
 - [x] Confirm repository and default branch.
 - [x] Confirm repository was initially empty.
 - [x] Record agreed stack and security constraints.
-- [ ] Confirm domain control, DNS access, and mailbox/address model.
+- [x] Choose one shared school inbox for authorized staff.
+- [ ] Confirm domain control and DNS access.
 - [ ] Verify Cloudflare inbound Email Worker setup and Brevo sender/domain requirements.
 - [ ] Select and document authentication/session approach.
 - [ ] Confirm Neon and R2 resources and deployment bindings.
@@ -51,8 +52,8 @@ Acceptance: core flows work on desktop and mobile, with accessible controls and 
 Acceptance: deployment is reproducible and a test report distinguishes verified behavior from pending provider/domain setup.
 
 ## Immediate inputs needed
-1. The domain that should receive school email and confirmation that its DNS can be changed.
-2. Access to the relevant Cloudflare and Brevo accounts for configuration. Do not paste secret keys into chat or commit them.
-3. Mailbox model: one shared school inbox or individual accounts for staff/users.
+1. The exact domain and shared school email address that should receive mail, plus confirmation that its DNS can be changed.
+2. Authentication preference for staff: Google sign-in, email/password, or another provider.
+3. Access to the relevant Cloudflare, Brevo, and Neon accounts for configuration. Do not paste secret keys into chat or commit them.
 
 Zoho remains a fallback if Cloudflare/Brevo cannot provide reliable real-world receiving and sending within the delivery window.

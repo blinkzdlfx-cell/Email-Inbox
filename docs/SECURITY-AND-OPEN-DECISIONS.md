@@ -9,9 +9,9 @@ Updated: 2026-10-20
 | School domain | `bukanabriliantschools.com` |
 | Shared mailbox | `info@bukanabriliantschools.com` |
 | Mailbox model | One shared school inbox for explicitly authorized staff |
-| Staff sign-in methods | Google sign-in and email/password |
+| Staff sign-in methods | Supabase Auth: Google sign-in and email/password |
 | Frontend direction | React, Vite, TypeScript, Tailwind CSS, shadcn/ui |
-| Database | Cloudflare D1 (SQLite) |
+| Database | Supabase Postgres |
 | Attachment storage | Backblaze B2 through its S3-compatible API; private bucket |
 | Inbound direction | Cloudflare Email Worker, pending feasibility/configuration checks |
 | Outbound direction | Brevo API, pending policy/deliverability suitability checks |
@@ -27,7 +27,8 @@ Updated: 2026-10-20
 7. Audit who sent, replied, forwarded, downloaded, or changed messages, without logging full message content or credentials.
 8. Provider acceptance is not delivery confirmation. Store provider state accurately and process verified callbacks idempotently.
 9. Keep the Backblaze B2 bucket private and authorize every attachment operation through the Worker.
-10. Never put real credentials, private message samples, or personal data in this public repository.
+10. Enable RLS on application tables. Do not expose mailbox data to all authenticated users merely because they can sign in.
+11. Never put real credentials, private message samples, or personal data in this public repository.
 
 ## Open decisions — blockers before production
 
@@ -36,11 +37,10 @@ Updated: 2026-10-20
 | P0 | Confirm a school administrator controls the domain's DNS and can change MX/TXT/CNAME records. | Required for inbound routing and sender authentication. |
 | P0 | Confirm Cloudflare account/domain availability and Email Worker support/limits for the intended receiving flow. | A forwarding-only setup is not a complete shared inbox. |
 | P0 | Verify Brevo allows and reliably supports ordinary human correspondence from this shared inbox; confirm account sending limits and domain authentication. | Transactional API suitability must not be assumed. |
-| P0 | Provision a dedicated D1 database and verify its binding/region/configuration. | Prevents accidentally connecting to an unrelated database. |
+| P0 | Create/confirm a dedicated Supabase project and test its database/Auth configuration. | Prevents accidental use of an unrelated project and confirms required capabilities. |
+| P0 | Configure Supabase Auth Google OAuth, allowed redirect URLs, email verification, and password recovery. | Required for secure sign-in and account recovery. |
 | P0 | Create a private Backblaze B2 bucket and a restricted application key; test S3-compatible access from a Worker. | Attachment uploads and downloads must remain private. |
-| P0 | Select and verify an authentication provider supporting both Google sign-in and email/password. | D1 itself is a database, not an authentication service. |
-| P0 | Configure the school's own Google OAuth client and trusted redirect origins for the selected provider. | Google sign-in requires correct provider setup. Never commit client secrets. |
-| P0 | Select production email delivery for verification and password reset. | Authentication emails need reliable delivery and domain alignment. |
+| P0 | Configure production email delivery for Supabase verification and password-reset messages. | Authentication emails need reliable delivery and domain alignment. |
 | P1 | Confirm the approved staff roster and who can invite/approve/deactivate accounts. | Prevents unauthorized staff from entering the shared mailbox. |
 | P1 | Decide staff roles (administrator, sender, read-only) and who can manage users. | Defines least-privilege access. |
 | P1 | Decide whether read/unread state is shared globally or per staff member. | Changes database model and UI behavior. |
@@ -51,17 +51,17 @@ Updated: 2026-10-20
 
 ## Authentication
 
-The auth provider has not been selected or configured. It must support Google sign-in, email/password, verification, password reset, secure sessions, and server-side verification. Do not assume D1 provides these capabilities and do not implement custom password/session cryptography. Record and review the provider choice before implementing protected endpoints.
+Supabase Auth is the selected provider for Google sign-in and email/password, but it is not yet configured. Set the site's canonical URL and exact allowed redirect URLs, configure Google OAuth, enable appropriate email verification and password recovery, and use production-grade email delivery. Do not allow sign-up alone to grant mailbox access. Application staff approval and role checks remain separate.
 
 ## Secrets/configuration checklist
 
-Use placeholders only in tracked examples. Store actual values in Cloudflare secrets/bindings and local ignored development files.
+Use placeholders only in tracked examples. Store actual values in Cloudflare secrets and ignored local development files.
 
-- D1 binding and database ID after provisioning
+- Supabase project URL and publishable key for browser-safe Auth operations
+- Supabase secret/service-role key only as a server-side Worker secret if needed; never expose it to the browser
 - Backblaze B2 bucket name, S3-compatible endpoint/region, key ID, and application key as server-side configuration/secrets
 - Brevo API key
-- Google OAuth client secret for the selected auth provider
-- Auth/session configuration required by the selected provider
+- Google OAuth credentials configured through Supabase Auth
 - Verified webhook secret/signature configuration
 - FCM credentials only if notifications are later enabled
 
@@ -69,16 +69,15 @@ Never send secrets in chat, place them in frontend source, or commit them.
 
 ## Initial database schema
 
-The initial migration is at `db/migrations/0001_shared_mailbox.sql`. It was originally written for PostgreSQL and **must be converted to and tested as SQLite/D1-compatible SQL before use**. It defines the shared mailbox, staff identity mapping and approval status, explicit mailbox roles, messages, recipients, attachment metadata, audit events, and provider events. It seeds the logical school mailbox only; it does not configure DNS or create a real mail account.
+The migration is at `db/migrations/0001_shared_mailbox.sql`. It must use PostgreSQL syntax suitable for the dedicated Supabase project. It defines the shared mailbox, staff identity mapping and approval status, explicit mailbox roles, messages, recipients, attachment metadata, audit events, and provider events. It seeds the logical school mailbox only; it does not configure DNS or create a real mail account.
 
-The migration has not been applied to any database. After conversion, review and test it against the dedicated Bukana D1 database only. Do not apply it to any unrelated project. Retention, attachment limits, shared-vs-per-user read state, and exact provider status transitions still require decisions.
+The migration has not been applied to any database. Review the RLS posture and permissions, then apply it only to the dedicated Bukana Supabase project. Do not apply it to any unrelated project. Retention, attachment limits, shared-vs-per-user read state, and exact provider status transitions still require decisions.
 
 ## Current verification status
 
 - Repository documentation and initial scaffold: committed; local build/test status still needs confirmation.
 - DNS/domain ownership: not verified.
-- Authentication: requirements recorded; provider not configured.
-- D1 database/binding: selected but not provisioned or verified.
+- Supabase project/database/Auth: selected but not configured or verified.
 - Backblaze B2 bucket/credentials: selected but not provisioned or verified.
 - Inbound email: not implemented or tested.
 - Outbound email: not implemented or tested.

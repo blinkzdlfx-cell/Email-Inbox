@@ -12,16 +12,16 @@ A secure, school-managed email inbox for Bukana Brilliant Schools.
 ## Planned stack
 
 - Frontend: React, Vite, TypeScript, Tailwind CSS, and shadcn/ui
+- API and application hosting: Cloudflare Workers
+- Database: Cloudflare D1 (SQLite)
+- Attachment storage: Backblaze B2 using its S3-compatible API; private bucket only
 - Inbound email: Cloudflare Email Routing and an Email Worker, subject to runtime and account verification
 - Outbound email: Brevo API, subject to sender/domain verification and suitability for human correspondence
-- Database: Neon Postgres
-- Attachments: private Cloudflare R2 bucket
-- Authentication candidate: Neon Auth (managed Better Auth), pending confirmation that the Neon project is eligible and the required production configuration is available
-- Hosting: Cloudflare Workers/Pages; exact deployment shape to be verified
+- Authentication: provider not yet selected or configured; must support Google sign-in and email/password
 
 ## Project status
 
-The repository currently contains planning documentation. Application code, authentication, database migrations, provider integrations, and deployment are **not yet implemented or verified**. Do not treat the address above as proof that DNS, mail routing, or the mailbox is already configured.
+The repository contains planning documentation and an initial application scaffold. Authentication, D1 provisioning/binding, Backblaze B2 integration, provider integrations, and production deployment are **not yet implemented or verified**. Do not treat the address above as proof that DNS, mail routing, or the mailbox is already configured.
 
 ## Security rules
 
@@ -29,6 +29,7 @@ The repository currently contains planning documentation. Application code, auth
 - Never commit secrets or expose them through frontend variables, logs, or API responses.
 - Authenticate and authorize every mailbox operation on the server.
 - Staff accounts must be explicitly approved; public sign-up must not grant mailbox access.
+- Keep the Backblaze B2 bucket private. Authorize every upload/download through the Worker; never expose permanent public object URLs or credentials.
 - Validate recipients, message input, attachment size/type, and upload/download permissions.
 - Use parameterized SQL, rate limits, safe HTML rendering, and security-focused tests.
 - Do not claim an email was delivered merely because a provider accepted a send request.
@@ -41,4 +42,4 @@ The repository currently contains planning documentation. Application code, auth
 
 ## Setup dependency
 
-The domain owner must be able to configure DNS for Cloudflare and Brevo. Provider credentials, Neon/R2 resources, staff provisioning policy, and production bindings must be configured and tested separately from local application builds.
+The domain owner must be able to configure DNS for Cloudflare and Brevo. Cloudflare D1 and Backblaze B2 resources, credentials, staff provisioning policy, and production bindings must be configured and tested separately from local application builds. Do not add real resource IDs or credentials to tracked files.

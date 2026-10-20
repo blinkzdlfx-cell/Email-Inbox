@@ -33,8 +33,17 @@ The exact Cloudflare receiving configuration and runtime limits must be verified
 - Email provider: Brevo API for outbound sending and configured delivery/bounce callbacks.
 - Notifications: FCM after the core inbox flow is reliable.
 
+## Mailbox model — decided
+
+Use **one shared school inbox for authorized staff**. This means:
+- The application has one logical school mailbox, with access limited to authenticated staff explicitly granted permission.
+- Individual staff accounts identify who viewed, sent, replied to, forwarded, or changed a message.
+- Every mailbox API route checks staff access on the server; hiding UI controls is not authorization.
+- Outbound mail uses the configured school sender identity, with sender permissions and audit attribution enforced server-side.
+- Message read/unread state and any future folders/labels must have a documented shared-versus-per-user behavior before implementation.
+
 ## Initial data model proposal
-Finalize the schema after deciding authentication and mailbox ownership. Expected entities include users or identity records, mailboxes and access, messages, recipients, attachments, sessions/provider state, push subscriptions, and idempotent provider event records. Use foreign keys, indexes, timestamps, and unique constraints. Do not store provider secrets in ordinary application tables.
+Use staff/user identity records, a single logical school mailbox, explicit staff-to-mailbox access/roles, messages, recipients, attachments, and audit events. Add sessions/provider state and idempotent provider event records as required by the chosen authentication and email-provider integrations. Use foreign keys, indexes, timestamps, and unique constraints. Do not store provider secrets in ordinary application tables.
 
 ## Security requirements
 - Implement authentication before exposing mailbox data.
@@ -60,7 +69,7 @@ Use local .dev.vars only for local development and keep it ignored by Git. Produ
 ## Decisions to verify before implementation
 - Domain name and mailbox naming strategy.
 - Authentication and account provisioning method.
-- One shared school mailbox versus individual staff mailboxes.
+- Confirm the exact school email domain and sender address for the shared inbox.
 - Cloudflare inbound email parsing and attachment limits.
 - Brevo sender/domain verification, DNS records, sending limits, and webhook setup.
 - Neon connection strategy compatible with Cloudflare Workers.

@@ -12,11 +12,14 @@ Prioritize a working end-to-end email loop, but do not skip security or claim an
 - [x] Choose one shared school inbox for authorized staff.
 - [x] Record domain `bukanabriliantschools.com` and address `info@bukanabriliantschools.com`.
 - [x] Record both Google sign-in and email/password as staff authentication requirements.
+- [x] Select Cloudflare D1 as database and Backblaze B2 as attachment storage.
 - [ ] Verify domain ownership and DNS access.
 - [ ] Verify Cloudflare inbound email configuration and runtime/message limits.
 - [ ] Verify Brevo suitability for human correspondence, sender/domain authentication, limits, and callbacks.
-- [ ] Verify Neon project eligibility for the selected auth approach and Cloudflare connection method.
-- [ ] Confirm Cloudflare Pages/Workers and R2 resources/bindings.
+- [ ] Provision a dedicated D1 database and record its real database ID.
+- [ ] Create a private Backblaze B2 bucket and restricted application key.
+- [ ] Verify the selected auth provider supports Google sign-in and email/password.
+- [ ] Confirm Cloudflare Worker bindings and secrets without committing credentials.
 
 ## Stage 1 — Secure application foundation
 
@@ -24,16 +27,17 @@ Prioritize a working end-to-end email loop, but do not skip security or claim an
 - [x] Add safe environment configuration example and secret-safe ignore rules.
 - [ ] Choose and configure the authentication provider; support Google and email/password.
 - [ ] Establish explicit staff provisioning/approval and server-side authorization.
-- [x] Add an initial versioned schema migration for staff mapping, mailbox, messages, recipients, attachments, provider events, and audit records.
+- [x] Add an initial versioned schema migration for staff mapping, mailbox, messages, recipients, attachments, provider events, and audit records (convert and test for D1 before applying).
 - [x] Add CI checks, type-checking, and an initial UI test. CI/build result still needs confirmation.
+- [ ] Add a private Backblaze B2 S3-compatible storage adapter and test it in Workers.
 - Acceptance: clean install/build succeeds, no secrets are committed, and unauthenticated or unapproved requests cannot read or mutate mailbox data.
 
 ## Stage 2 — Inbound email
 
 - [ ] Implement Cloudflare email handler and MIME parsing.
-- [ ] Store message metadata and body in Neon.
-- [ ] Store attachments privately in R2.
-- [ ] Make retries idempotent and handle malformed messages safely.
+- [ ] Store message metadata and body in D1.
+- [ ] Store attachments privately in Backblaze B2.
+- [ ] Make inbound processing idempotent and handle malformed messages safely.
 - [ ] Add authorized inbox listing and message detail endpoints.
 - Acceptance: a real test email to the configured domain appears in the authenticated inbox, including supported body parts and attachments, without cross-mailbox access.
 

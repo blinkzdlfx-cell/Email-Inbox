@@ -65,9 +65,16 @@ Use placeholders only in tracked examples. Store actual values in Cloudflare sec
 
 Never send secrets in chat, place them in frontend source, or commit them.
 
+## Initial database schema
+
+The first migration is at `db/migrations/0001_shared_mailbox.sql`. It defines the shared mailbox, staff identity mapping and approval status, explicit mailbox roles, messages, recipients, private attachment metadata, audit events, and idempotent provider events. It seeds the logical school mailbox only; it does not configure DNS or create a real mail account.
+
+The migration has not been applied to any database. Review and test it against a dedicated Bukana Neon project before applying it. Do not apply it to Brilina Forge or any unrelated project. Retention, attachment limits, shared-vs-per-user read state, and exact provider status transitions still require decisions.
+
 ## Current verification status
 
 - Repository documentation: recorded.
+- Frontend and Worker scaffold: committed; not locally built in this environment.
 - DNS/domain ownership: not verified.
 - Authentication: requirements recorded; provider not configured.
 - Database/R2/Cloudflare bindings: not verified.

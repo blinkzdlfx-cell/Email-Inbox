@@ -20,12 +20,12 @@ Prioritize a working end-to-end email loop, but do not skip security or claim an
 
 ## Stage 1 — Secure application foundation
 
-- [ ] Create React/Vite/TypeScript frontend and Cloudflare-compatible API structure.
-- [ ] Add environment validation and safe configuration examples.
+- [x] Create React/Vite/TypeScript frontend and minimal Cloudflare-compatible API structure (sign-in intentionally disabled).
+- [x] Add safe environment configuration example and secret-safe ignore rules.
 - [ ] Choose and configure the authentication provider; support Google and email/password.
 - [ ] Establish explicit staff provisioning/approval and server-side authorization.
-- [ ] Add versioned schema migrations for staff mapping, mailbox, messages, recipients, attachments, and audit records.
-- [ ] Add CI checks, formatting, type-checking, and tests.
+- [x] Add an initial versioned schema migration for staff mapping, mailbox, messages, recipients, attachments, provider events, and audit records.
+- [x] Add CI checks, type-checking, and an initial UI test. CI/build result still needs confirmation.
 - Acceptance: clean install/build succeeds, no secrets are committed, and unauthenticated or unapproved requests cannot read or mutate mailbox data.
 
 ## Stage 2 — Inbound email

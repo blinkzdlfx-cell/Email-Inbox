@@ -11,23 +11,23 @@ Prioritize a working end-to-end email loop, but do not skip security or claim an
 - [x] Record agreed stack and security constraints.
 - [x] Choose one shared school inbox for authorized staff.
 - [x] Record domain `bukanabriliantschools.com` and address `info@bukanabriliantschools.com`.
-- [x] Record both Google sign-in and email/password as staff authentication requirements.
-- [x] Select Cloudflare D1 as database and Backblaze B2 as attachment storage.
+- [x] Record Google sign-in and email/password as staff authentication requirements.
+- [x] Select Supabase Auth and Supabase Postgres; retain Backblaze B2 for private attachments.
+- [ ] Create/confirm a dedicated Supabase project and record its project URL and required public/server-side keys securely.
+- [ ] Configure Google OAuth, Supabase Auth redirect URLs, email verification, and password recovery.
+- [ ] Create a private Backblaze B2 bucket and restricted application key.
 - [ ] Verify domain ownership and DNS access.
 - [ ] Verify Cloudflare inbound email configuration and runtime/message limits.
 - [ ] Verify Brevo suitability for human correspondence, sender/domain authentication, limits, and callbacks.
-- [ ] Provision a dedicated D1 database and record its real database ID.
-- [ ] Create a private Backblaze B2 bucket and restricted application key.
-- [ ] Verify the selected auth provider supports Google sign-in and email/password.
-- [ ] Confirm Cloudflare Worker bindings and secrets without committing credentials.
+- [ ] Confirm Cloudflare Worker secrets and production configuration without committing credentials.
 
 ## Stage 1 — Secure application foundation
 
 - [x] Create React/Vite/TypeScript frontend and minimal Cloudflare-compatible API structure (sign-in intentionally disabled).
 - [x] Add safe environment configuration example and secret-safe ignore rules.
-- [ ] Choose and configure the authentication provider; support Google and email/password.
+- [ ] Configure Supabase Auth for Google and email/password.
 - [ ] Establish explicit staff provisioning/approval and server-side authorization.
-- [x] Add an initial versioned schema migration for staff mapping, mailbox, messages, recipients, attachments, provider events, and audit records (convert and test for D1 before applying).
+- [ ] Review and apply the PostgreSQL schema migration to the dedicated Supabase project only after RLS and permissions review.
 - [x] Add CI checks, type-checking, and an initial UI test. CI/build result still needs confirmation.
 - [ ] Add a private Backblaze B2 S3-compatible storage adapter and test it in Workers.
 - Acceptance: clean install/build succeeds, no secrets are committed, and unauthenticated or unapproved requests cannot read or mutate mailbox data.
@@ -35,7 +35,7 @@ Prioritize a working end-to-end email loop, but do not skip security or claim an
 ## Stage 2 — Inbound email
 
 - [ ] Implement Cloudflare email handler and MIME parsing.
-- [ ] Store message metadata and body in D1.
+- [ ] Store message metadata and body in Supabase Postgres.
 - [ ] Store attachments privately in Backblaze B2.
 - [ ] Make inbound processing idempotent and handle malformed messages safely.
 - [ ] Add authorized inbox listing and message detail endpoints.
